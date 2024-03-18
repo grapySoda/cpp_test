@@ -1,7 +1,7 @@
 TARGET = test
 
 CXX = g++
-CXXFLAGS = -std=c++11 -Wall -Wextra -I./include
+CXXFLAGS = -std=c++11 -Wall -Wextra -I./include -lboost_program_options
 LDFLAGS = -pthread
 
 SRCS = main.cpp
