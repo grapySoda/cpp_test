@@ -1,43 +1,27 @@
 #include <iostream>
-#include <boost/program_options.hpp>  // sudo apt install libboost-all-dev
+#include <sys/statvfs.h>
 
-namespace po = boost::program_options;
-
-int main(int argc, char** argv)
+int main()
 {
-    try {
-        po::options_description desc("Allowed options");
-        desc.add_options()("help", "produce help message")(
-            "input,i", po::value<std::string>(), "input file")(
-            "output,o", po::value<std::string>(), "output file");
+    const char* path = "/";  // 这里设置你要查询的文件系统路径，通常是根目录 "/"
+    struct statvfs buf;
 
-        po::variables_map vm;
-        po::store(po::parse_command_line(argc, argv, desc), vm);
-        po::notify(vm);
+    if (statvfs(path, &buf) == 0) {
+        unsigned long long totalSpace = buf.f_blocks * buf.f_frsize;
+        unsigned long long freeSpace = buf.f_bfree * buf.f_frsize;
+        unsigned long long availableSpace = buf.f_bavail * buf.f_frsize;
 
-        if (vm.count("help")) {
-            std::cout << desc << "\n";
-            return 1;
-        }
-
-        if (vm.count("input")) {
-            std::cout << "Input file: " << vm["input"].as<std::string>()
-                      << "\n";
-        } else {
-            std::cout << "Input file was not set.\n";
-        }
-
-        if (vm.count("output")) {
-            std::cout << "Output file: " << vm["output"].as<std::string>()
-                      << "\n";
-        } else {
-            std::cout << "Output file was not set.\n";
-        }
-    } catch (std::exception& e) {
-        std::cerr << "error: " << e.what() << "\n";
+        std::cout << "Total space: " << totalSpace / (1024 * 1024 * 1024)
+                  << " GB" << std::endl;
+        std::cout << "Free space: " << freeSpace / (1024 * 1024 * 1024) << " GB"
+                  << std::endl;
+        std::cout << "Available space: "
+                  << availableSpace / (1024 * 1024 * 1024) << " GB"
+                  << std::endl;
+    } else {
+        std::cerr << "Error occurred while getting file system information."
+                  << std::endl;
         return 1;
-    } catch (...) {
-        std::cerr << "Exception of unknown type!\n";
     }
 
     return 0;
