@@ -1,37 +1,34 @@
 #include <iostream>
-#include <sys/statvfs.h>
 
-double getDiskUsageRatio(const std::string& path)
+class MyClass
 {
-    struct statvfs fsInfo;
+   public:
+    typedef void (MyClass::*FunctionPtr)();
 
-    // 使用 statvfs 函數獲取指定路徑的文件系統信息
-    if (statvfs(path.c_str(), &fsInfo) != 0) {
-        std::cerr << "Error: Failed to get filesystem stats for path: " << path
-                  << std::endl;
-        return -1.0;  // 返回負值表示錯誤
+    MyClass(bool condition)
+    {
+        if (condition) {
+            A = &MyClass::B;
+        } else {
+            A = &MyClass::C;
+        }
     }
 
-    // 計算已使用空間與總空間的比率
-    double totalSpace =
-        static_cast<double>(fsInfo.f_blocks) * fsInfo.f_frsize;  // 總空間
-    double usedSpace = static_cast<double>(fsInfo.f_blocks - fsInfo.f_bfree) *
-                       fsInfo.f_frsize;  // 已使用空間
-    double usageRatio = usedSpace / totalSpace;
-    return usageRatio;
-}
+    void B() { std::cout << "Method B" << std::endl; }
+    void C() { std::cout << "Method C" << std::endl; }
+    void ExecuteA() { (this->*A)(); }
+
+   private:
+    FunctionPtr A;
+};
 
 int main()
 {
-    std::string path;
-    std::cout << "Enter the path: ";
-    std::cin >> path;
+    MyClass obj(true);
+    obj.ExecuteA();
 
-    double usageRatio = getDiskUsageRatio(path);
-    if (usageRatio >= 0) {
-        std::cout << "Disk usage ratio at " << path << ": " << usageRatio
-                  << std::endl;
-    }
+    MyClass obj2(false);
+    obj2.ExecuteA();
 
     return 0;
 }
