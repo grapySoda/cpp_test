@@ -1,34 +1,37 @@
 #include <iostream>
 
-class MyClass
+class PpeDB
 {
    public:
-    typedef void (MyClass::*FunctionPtr)();
+    typedef void (PpeDB::*FunctionPtr)();
 
-    MyClass(bool condition)
+    PpeDB(bool condition)
     {
         if (condition) {
-            A = &MyClass::B;
+            clean_method = &PpeDB::clean_destory;
         } else {
-            A = &MyClass::C;
+            clean_method = &PpeDB::clean_overwrite;
         }
     }
 
-    void B() { std::cout << "Method B" << std::endl; }
-    void C() { std::cout << "Method C" << std::endl; }
-    void ExecuteA() { (this->*A)(); }
+    void clean_destory() { std::cout << "Method clean_destory" << std::endl; }
+    void clean_overwrite()
+    {
+        std::cout << "Method clean_overwrite" << std::endl;
+    }
+    void clean() { (this->*clean_method)(); }
 
    private:
-    FunctionPtr A;
+    FunctionPtr clean_method;
 };
 
 int main()
 {
-    MyClass obj(true);
-    obj.ExecuteA();
+    PpeDB obj(true);
+    obj.clean();
 
-    MyClass obj2(false);
-    obj2.ExecuteA();
+    PpeDB obj2(false);
+    obj2.clean();
 
     return 0;
 }
