@@ -3,7 +3,7 @@
 class MyClass
 {
    public:
-    typedef void (MyClass::*FunctionPtr)();
+    typedef int (MyClass::*FunctionPtr)();
 
     MyClass(bool condition)
     {
@@ -14,9 +14,17 @@ class MyClass
         }
     }
 
-    void B() { std::cout << "Method B" << std::endl; }
-    void C() { std::cout << "Method C" << std::endl; }
-    void ExecuteA() { (this->*A)(); }
+    int B()
+    {
+        std::cout << "Method B" << std::endl;
+        return 42;
+    }
+    int C()
+    {
+        std::cout << "Method C" << std::endl;
+        return 99;
+    }
+    int ExecuteA() { return (this->*A)(); }
 
    private:
     FunctionPtr A;
@@ -25,10 +33,12 @@ class MyClass
 int main()
 {
     MyClass obj(true);
-    obj.ExecuteA();
+    int result1 = obj.ExecuteA();
+    std::cout << "Result from B: " << result1 << std::endl;
 
     MyClass obj2(false);
-    obj2.ExecuteA();
+    int result2 = obj2.ExecuteA();
+    std::cout << "Result from C: " << result2 << std::endl;
 
     return 0;
 }
